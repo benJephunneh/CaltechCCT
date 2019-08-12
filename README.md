@@ -1,1 +1,1 @@
-# CaltechCCT
+# This Camera Calibration Toolbox for MATLAB is based on [Jean-Yves Bouguet's toolbox](http://www.vision.caltech.edu/bouguetj/calib_doc/index.html) of the same name.  The original toolbox is a collection of scripts, so my goal, here, is to bring coherence to a lot of the tools (make classes, methods, etc.), as well as clean up the code, where I'm able, and expand its use for projector calibration.
