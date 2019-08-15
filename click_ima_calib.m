@@ -36,7 +36,7 @@ while ginputting
     
     for count = 1:4
         [xi,yi] = ginput4(1);
-        [xxi] = cornerfinder([xi yi],I,winty,wintx);
+        [xxi] = cornerfinder([xi; yi],I,winty,wintx);
         xi = xxi(1);
         yi = xxi(2);
         figure(2);

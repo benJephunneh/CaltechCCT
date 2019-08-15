@@ -29,50 +29,50 @@
 %In the future, a more general function will be there.
 %For now, if using a 3D calibration rig, quick_init is set to 1 for an easy initialization of the focal length
 
-if ~exist('desactivated_images'),
+if ~exist('desactivated_images', 'var')
     desactivated_images = [];
-end;
+end
 
 
 
-if ~exist('est_aspect_ratio'),
+if ~exist('est_aspect_ratio', 'var')
     est_aspect_ratio = 1;
-end;
+end
 
-if ~exist('est_fc');
+if ~exist('est_fc', 'var')
     est_fc = [1;1]; % Set to zero if you do not want to estimate the focal length (it may be useful! believe it or not!)
-end;
+end
 
-if ~exist('recompute_extrinsic'),
+if ~exist('recompute_extrinsic', 'var')
     recompute_extrinsic = 1; % Set this variable to 0 in case you do not want to recompute the extrinsic parameters
     % at each iterstion.
-end;
+end
 
-if ~exist('MaxIter'),
+if ~exist('MaxIter', 'var')
     MaxIter = 30; % Maximum number of iterations in the gradient descent
-end;
+end
 
-if ~exist('check_cond'),
+if ~exist('check_cond', 'var')
     check_cond = 1; % Set this variable to 0 in case you don't want to extract view dynamically
-end;
+end
 
-if ~exist('center_optim'),
+if ~exist('center_optim', 'var')
     center_optim = 1; %%% Set this variable to 0 if your do not want to estimate the principal point
-end;
+end
 
-if exist('est_dist'),
-    if length(est_dist) == 4,
+if exist('est_dist', 'var')
+    if length(est_dist) == 4
         est_dist = [est_dist ; 0];
-    end;
-end;
+    end
+end
 
-if ~exist('est_dist'),
+if ~exist('est_dist', 'var')
     est_dist = [1;1;1;1;0];
-end;
+end
 
-if ~exist('est_alpha'),
+if ~exist('est_alpha', 'var')
     est_alpha = 0; % by default, do not estimate skew
-end;
+end
 
 
 % Little fix in case of stupid values in the binary variables:
@@ -86,11 +86,11 @@ est_aspect_ratio = double(~~est_aspect_ratio);
 
 fprintf(1,'\n');
 
-if ~exist('nx')&~exist('ny'),
+if ~exist('nx', 'var') && ~exist('ny', 'var')
     fprintf(1,'WARNING: No image size (nx,ny) available. Setting nx=640 and ny=480. If these are not the right values, change values manually.\n');
-    nx = 640;
-    ny = 480;
-end;
+    nx = 1280;
+    ny = 720;
+end
 
 
 check_active_images;
@@ -227,64 +227,64 @@ thresh_cond = 1e6;
 
 % Initialization of the intrinsic parameters (if necessary)
 
-if ~exist('cc'),
+if ~exist('cc', 'var')
     fprintf(1,'Initialization of the principal point at the center of the image.\n');
     cc = [(nx-1)/2;(ny-1)/2];
     alpha_smooth = 0.1; % slow convergence
-end;
+end
 
 
-if exist('kc'),
-    if length(kc) == 4;
+if exist('kc', 'var')
+    if length(kc) == 4
         fprintf(1,'Adding a new distortion coefficient to kc -> radial distortion model up to the 6th degree');
         kc = [kc;0];
-    end;
-end;
+    end
+end
 
-if ~exist('alpha_c'),
+if ~exist('alpha_c', 'var')
     fprintf(1,'Initialization of the image skew to zero.\n');
     alpha_c = 0;
     alpha_smooth = 0.1; % slow convergence
-end;
+end
 
-if ~exist('fc') && quick_init,
+if ~exist('fc', 'var') && quick_init
     FOV_angle = 35; % Initial camera field of view in degrees
     fprintf(1,['Initialization of the focal length to a FOV of ' num2str(FOV_angle) ' degrees.\n']);
     fc = (nx/2)/tan(pi*FOV_angle/360) * ones(2,1);
     est_fc = [1;1];
     alpha_smooth = 0.1; % slow 
-end;
+end
 
 
-if ~exist('fc'),
+if ~exist('fc', 'var')
     % Initialization of the intrinsic parameters:
     fprintf(1,'Initialization of the intrinsic parameters using the vanishing points of planar patterns.\n')
     init_intrinsic_param; % The right way to go (if quick_init is not active)!
     alpha_smooth = 0.1; % slow convergence
     est_fc = [1;1];
-end;
+end
 
 
-if ~exist('kc'),
+if ~exist('kc', 'var')
     fprintf(1,'Initialization of the image distortion to zero.\n');
     kc = zeros(5,1);
     alpha_smooth = 0.1; % slow convergence
-end;
+end
 
-if ~est_aspect_ratio,
+if ~est_aspect_ratio
     fc(1) = (fc(1)+fc(2))/2;
     fc(2) = fc(1);
-end;
+end
 
-if ~prod(double(est_dist)),
+if ~prod(double(est_dist))
     % If no distortion estimated, set to zero the variables that are not estimated
     kc = kc .* est_dist;
-end;
+end
 
 
-if ~prod(double(est_fc)),
+if ~prod(double(est_fc))
     fprintf(1,'Warning: The focal length is not fully estimated (est_fc ~= [1;1])\n');
-end;
+end
 
 
 %%% Initialization of the extrinsic parameters for global minimization:
@@ -319,7 +319,7 @@ fprintf(1,'Gradient descent iterations: ');
 param_list = param;
 
 
-while (change > 1e-9) && (iter < MaxIter),
+while (change > 1e-9) && (iter < MaxIter)
     
     fprintf(1,'%d...',iter+1);
     
@@ -343,20 +343,20 @@ while (change > 1e-9) && (iter < MaxIter),
     ex3 = zeros(15 + 6*n_ima,1);
     
     
-    for kk = ind_active, %1:n_ima,
+    for kk = ind_active %1:n_ima,
         %if active_images(kk),
         
         omckk = param(15+6*(kk-1) + 1:15+6*(kk-1) + 3); 
         
         Tckk = param(15+6*(kk-1) + 4:15+6*(kk-1) + 6); 
         
-        if isnan(omckk(1)),
+        if isnan(omckk(1))
             fprintf(1,'Intrinsic parameters at frame %d do not exist\n',kk);
             return;
-        end;
+        end
         
-        eval(['X_kk = X_' num2str(kk) ';']);
-        eval(['x_kk = x_' num2str(kk) ';']);
+        eval(['X_kk = X_' num2str(kk) ';'])
+        eval(['x_kk = x_' num2str(kk) ';'])
         
         Np = N_points_views(kk);
         

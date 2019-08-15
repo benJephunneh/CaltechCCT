@@ -183,11 +183,11 @@ if Nl > 0 % If the directory has calib_name* files...
         
         active_images = ones(1,n_ima);
         
-    end;
+    end
     
 else
     
     fprintf(1,'No image found. Basename may be wrong.\n');
     
-end;
+end
 

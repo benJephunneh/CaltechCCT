@@ -16,7 +16,7 @@ fixvariable;
 % fixvariable('map')
 
 
-if ~exist('n_ima')
+if ~exist('n_ima', 'var')
     data_calib_lab_data;
 end
 
@@ -34,8 +34,9 @@ end
 fprintf(1,'\nExtraction of the grid corners on the images\n');
 
 
-if (~exist('map', 'var')), map = gray(256); end
-
+if (~exist('map', 'var'))
+    map = gray(256);
+end
 
 if exist('dX', 'var')
     dX_default = dX;
@@ -54,7 +55,7 @@ if exist('n_sq_y', 'var')
 end
 
 
-if ~exist('dX_default', 'var') | ~exist('dY_default', 'var')
+if ~exist('dX_default', 'var') || ~exist('dY_default', 'var')
     
     % Setup of JY - 3D calibration rig at Intel (new at Intel) - use units in mm to match Zhang
     dX_default = 30;
@@ -209,7 +210,7 @@ eval(string_save);
 
 disp('done');
 
-return
+% return % End of script, anyway, so this is unnecessary.
 
 % go_calib_optim;
 

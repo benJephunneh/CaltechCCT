@@ -1,5 +1,5 @@
 % Modified to open lab data format. - 04/10/19 (DY)
-% Modified to improve code. - 8 Aug 19 (CPM)
+% Modified: 15 Aug 19 (CPM)
 
 if ~exist('calib_name') || ~exist('format_image') % This is already done in data_calib_lab_data.m.
    data_calib_lab_data;
