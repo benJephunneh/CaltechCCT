@@ -1,8 +1,8 @@
-
-if ~exist('calib_name', 'var') || ~exist('format_image', 'var')
-   data_calib
-   return
-end
+% 
+% if ~exist('calib_name', 'var') || ~exist('format_image', 'var')
+%    data_calib
+%    return
+% end
 
 check_directory;
 
