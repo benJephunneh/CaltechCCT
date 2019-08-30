@@ -36,10 +36,9 @@
 
 check_directory;
 
-%string_save = 'save calib_data n_ima type_numbering N_slots image_numbers format_image calib_name first_num';
-%eval(string_save);
+% string_save = 'save calib_data n_ima type_numbering N_slots image_numbers format_image calib_name first_num';
+% eval(string_save);
 
-% if Nima_valid
 % Reading images:
     ima_read_calib; % may be launched from the toolbox itself
 
