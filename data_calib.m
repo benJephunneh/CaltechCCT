@@ -19,7 +19,7 @@
     end
 
 % Extract 'calib_name' and 'format_image' variables:
-    expr = '(?<calib_name>\D*?)\d+\.(?<format_image>\w+$)';
+    expr = '(?<calib_name>\D*?\w*?\D*?)\d+\.(?<format_image>\w+$)';
     tokens = regexpi(images{1}, expr, 'names');
     
     switch tokens.format_image
@@ -31,26 +31,20 @@
     
     calib_name = tokens.calib_name;
     format_image = tokens.format_image;
-    clear tokens expr
+    clear tokens
     
-
-Nl = size(images, 2); % length(strfind([images{:}], format_image)); % Length of calib_name*.format_image dir listing
-Nima_valid = 0;
-ind_valid = [];
-loc_extension = [];
-length_name = size(calib_name, 2);
 
 check_directory;
 
 %string_save = 'save calib_data n_ima type_numbering N_slots image_numbers format_image calib_name first_num';
 %eval(string_save);
 
-if ~contains(Nima_valid)
-    % Reading images:
+% if Nima_valid
+% Reading images:
     ima_read_calib; % may be launched from the toolbox itself
-    % Show all the calibration images:
+
+% Show all the calibration images:
     if ~isempty(ind_read)
         mosaic;
     end
-end
 
