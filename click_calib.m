@@ -1,4 +1,4 @@
-% Modified to improve code: 8 Aut 19 (CPM)
+% Modified: 16 Aut 19 (CPM)
 
 %if exist('images_read');
 %   active_images = active_images & images_read;
@@ -16,11 +16,11 @@ fixvariable;
 % fixvariable('map')
 
 
-if ~exist('n_ima')
+if ~exist('n_ima', 'var')
     data_calib_lab_data;
 end
 
-check_active_images;
+check_active_images
 
 if ~exist(['I_' num2str(ind_active(1))], 'var')
     ima_read_calib_lab_data;
@@ -155,7 +155,7 @@ end
 
 for kk = ima_proc
     if exist(['I_' num2str(kk)], 'var')
-        click_ima_calib;
+        click_ima_calib
         active_images(kk) = 1;
     else
         eval(['dX_' num2str(kk) ' = NaN;']);

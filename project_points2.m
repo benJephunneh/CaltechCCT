@@ -25,63 +25,76 @@ function [xp,dxpdom,dxpdT,dxpdf,dxpdc,dxpdk,dxpdalpha] = project_points2(X,om,T,
 %Let P be a point in 3D of coordinates X in the world reference frame (stored in the matrix X)
 %The coordinate vector of P in the camera reference frame is: Xc = R*X + T
 %where R is the rotation matrix corresponding to the rotation vector om: R = rodrigues(om);
-%call x, y and z the 3 coordinates of Xc: x = Xc(1); y = Xc(2); z = Xc(3);
-%The pinehole projection coordinates of P is [a;b] where a=x/z and b=y/z.
+%call x, y, and z the 3 coordinates of Xc (i.e. x = Xc(1); y = Xc(2); z = Xc(3));
+%The pinehole projection coordinates of P is [a; b] where a=x/z and b=y/z.
 %call r^2 = a^2 + b^2.
-%The distorted point coordinates are: xd = [xx;yy] where:
+%The distorted point coordinates are: xd = [xx; yy] where:
 %
 %xx = a * (1 + kc(1)*r^2 + kc(2)*r^4 + kc(5)*r^6)      +      2*kc(3)*a*b + kc(4)*(r^2 + 2*a^2);
 %yy = b * (1 + kc(1)*r^2 + kc(2)*r^4 + kc(5)*r^6)      +      kc(3)*(r^2 + 2*b^2) + 2*kc(4)*a*b;
 %
 %The left terms correspond to radial distortion (6th degree), the right terms correspond to tangential distortion
 %
-%Finally, convertion into pixel coordinates: The final pixel coordinates vector xp=[xxp;yyp] where:
+%Finally, conversion into pixel coordinates: The final pixel coordinates vector xp=[xxp; yyp] where
+%   xxp = f(1)*(xx + alpha*yy) + c(1)
+%   yyp = f(2)*yy + c(2)
 %
-%xxp = f(1)*(xx + alpha*yy) + c(1)
-%yyp = f(2)*yy + c(2)
 %
-%
-%NOTE: About 90 percent of the code takes care fo computing the Jacobian matrices
-%
+%NOTE: About 90 percent of the code takes care [of] computing the Jacobian matrices
 %
 %Important function called within that program:
-%
-%rodrigues.m: Computes the rotation matrix corresponding to a rotation vector
-%
-%rigid_motion.m: Computes the rigid motion transformation of a given structure
+%   rodrigues.m: Computes the rotation matrix corresponding to a rotation vector
+%   rigid_motion.m: Computes the rigid motion transformation of a given structure
+
+switch nargin
+    case {1:6}
+        alpha = 0;
+    case {1:5}
+        k = zeros(5, 1);
+    case {1:4}
+        c = zeros(2, 1);
+    case {1:3}
+        f = ones(2, 1);
+    case {1:2}
+        T = zeros(3, 1);
+    case 1
+        om = zeros(3, 1);
+    case 0
+        error('Need at least a 3D structure to project (in ''project_points.m'')')
+end
+
+% if nargin < 7,
+%     alpha = 0;
+%     if nargin < 6,
+%         k = zeros(5,1);
+%         if nargin < 5,
+%             c = zeros(2,1);
+%             if nargin < 4,
+%                 f = ones(2,1);
+%                 if nargin < 3,
+%                     T = zeros(3,1);
+%                     if nargin < 2,
+%                         om = zeros(3,1);
+%                         if nargin < 1,
+%                             error('Need at least a 3D structure to project (in project_points.m)');
+%                             return; % CPM: 'error' does 'return'
+%                         end;
+%                     end;
+%                 end;
+%             end;
+%         end;
+%     end;
+% end;
 
 
-if nargin < 7,
-    alpha = 0;
-    if nargin < 6,
-        k = zeros(5,1);
-        if nargin < 5,
-            c = zeros(2,1);
-            if nargin < 4,
-                f = ones(2,1);
-                if nargin < 3,
-                    T = zeros(3,1);
-                    if nargin < 2,
-                        om = zeros(3,1);
-                        if nargin < 1,
-                            error('Need at least a 3D structure to project (in project_points.m)');
-                            return;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+% [m, n] = size(X); % CPM: If 'm' is unused, just do...
+n = size(X, 2);
 
-
-[m,n] = size(X);
-
-if nargout > 1,
-    [Y,dYdom,dYdT] = rigid_motion(X,om,T);
+if nargout > 1
+    [Y, dYdom, dYdT] = rigid_motion(X, om, T);
 else
-    Y = rigid_motion(X,om,T);
-end;
+    Y = rigid_motion(X, om, T);
+end
 
 
 inv_Z = 1./Y(3,:);

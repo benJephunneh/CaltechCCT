@@ -1,8 +1,7 @@
 % go_calib_stereo.m
+%Script for Calibrating a stereo rig (two cameras, internal and external calibration):
 %
-% Script for Calibrating a stereo rig (two cameras, internal and external calibration):
-%
-% It is assumed that the two cameras (left and right) have been calibrated with the pattern at the same 3D locations, and the same points
+% It is assumed the two cameras (left and right) have been calibrated with the pattern at the same 3D locations, and the same points
 % on the pattern (select the same grid points). Therefore, in particular, the same number of images were used to calibrate both cameras.
 %
 % 
@@ -28,36 +27,31 @@
 % means that for the kkth pair of images, the left and right images are found to have captured the calibration pattern at two
 % different locations in space. That means that the two views are not consistent, and therefore cannot be used for stereo calibration.
 % When capturing your images, make sure that you do not move the calibration pattern between capturing the left and the right images.
-% The pattwern can (and should) be moved in space only between two sets of (left,right) images.
+% The pattern can (and should) be moved in space only between two sets of (left,right) images.
 % Another reason for inconsistency is that you selected a different set of points on the pattern when running the separate calibrations
 % (leading to the two files Calib_Results_left.mat and Calib_Results_left.mat). Make sure that the same points are selected in the
 % two separate calibration. In other words, the points need to correspond.
 % For disabling this process of inconsistent image pairs detection, set the variable 'inconsistent_pairs_detection' to zero
 
 
-
-if ~exist('inconsistent_pairs_detection'),
+if ~exist('inconsistent_pairs_detection', 'var')
     inconsistent_pairs_detection = 1;
-end;
+end
 
-
-
-if inconsistent_pairs_detection,
+if inconsistent_pairs_detection
     %- This threshold is used only to automatically identify non-consistant image pairs (set to Infinity to not reject pairs)
     threshold = 50; %1.673; %1e10; %50; 
 else
     threshold = Inf;
-end;
+end
 
-
-if ~exist('recompute_intrinsic_right'),
+if ~exist('recompute_intrinsic_right', 'var')
     recompute_intrinsic_right = 1;
-end;
+end
 
-
-if ~exist('recompute_intrinsic_left'),
+if ~exist('recompute_intrinsic_left', 'var')
     recompute_intrinsic_left = 1;
-end;
+end
 
 center_optim_left_st = center_optim_left;
 est_alpha_left_st = est_alpha_left;
@@ -70,91 +64,76 @@ est_dist_right_st = est_dist_right;
 est_fc_right_st = est_fc_right;
 est_aspect_ratio_right_st = est_aspect_ratio_right; % just to fix conflicts
 
-if ~recompute_intrinsic_left,
+if ~recompute_intrinsic_left
     fprintf(1,'\nNo recomputation of the intrinsic parameters of the left camera (recompute_intrinsic_left = 0)\n');
     center_optim_left_st = 0;
     est_alpha_left_st = 0;
     est_dist_left_st = zeros(5,1);
-    est_fc_left_st = [0;0];
+    est_fc_left_st = zeros(2,1);
     est_aspect_ratio_left_st = 1; % just to fix conflicts
 else
     fprintf(1,'\nRecomputation of the intrinsic parameters of the left camera (recompute_intrinsic_left = 1)\n');
-end;
+end
 
-
-if ~recompute_intrinsic_right,
+if ~recompute_intrinsic_right
     fprintf(1,'\nNo recomputation of the intrinsic parameters of the right camera (recompute_intrinsic_left = 0)\n');
     center_optim_right_st = 0;
     est_alpha_right_st = 0;
     est_dist_right_st = zeros(5,1);
-    est_fc_right_st = [0;0];
+    est_fc_right_st = zeros(2,1);
     est_aspect_ratio_right_st = 1; % just to fix conflicts
 else
     fprintf(1,'\nRecomputation of the intrinsic parameters of the right camera (recompute_intrinsic_right = 1)\n');
-end;
+end
 
 %- Set to zero the entries of the distortion vectors that are not attempted to be estimated.
 kc_right = kc_right .* ~~est_dist_right;
 kc_left = kc_left .* ~~est_dist_left;
 
-
 active_images = active_images_left & active_images_right;
-
 history = [];
 
 fprintf(1,'\nMain stereo calibration optimization procedure - Number of pairs of images: %d\n',length(find(active_images)));
 fprintf(1,'Gradient descent iterations: ');
-    
-
 MaxIter = 100;
 change = 1;
 iter = 1;
 
-while (change > 5e-6)&(iter <= MaxIter),
-    
-    
+while (change > 5e-6) & (iter <= MaxIter)
     fprintf(1,'%d...',iter);
     
     % Jacobian:
-    
     J = [];
     e = [];
-    if iter == 1,
+    if iter == 1
         e_ref = [];
-    end;
+    end
     
-    param = [fc_left;cc_left;alpha_c_left;kc_left;fc_right;cc_right;alpha_c_right;kc_right;om;T];
+    param = [fc_left; cc_left; alpha_c_left; kc_left; fc_right; cc_right; alpha_c_right; kc_right; om; T];
     
-    
-    for kk = 1:n_ima,
-        
-        if active_images(kk),
-            
+    for kk = 1:n_ima
+        if active_images(kk)
             % Project the structure onto the left view:
-            
             eval(['Xckk = X_left_' num2str(kk) ';']);
             eval(['omckk = omc_left_' num2str(kk) ';']);
             eval(['Tckk = Tc_left_' num2str(kk) ';']);
-            
             eval(['xlkk = x_left_' num2str(kk) ';']);
             eval(['xrkk = x_right_' num2str(kk) ';']);
             
-            param = [param;omckk;Tckk];
+            param = [param; omckk; Tckk];
             
             % number of points:
             Nckk = size(Xckk,2);
             
-            
             Jkk = sparse(4*Nckk,20+(1+n_ima)*6);
             ekk = zeros(4*Nckk,1);
             
-            
-            if ~est_aspect_ratio_left,
+            if ~est_aspect_ratio_left
                 [xl,dxldomckk,dxldTckk,dxldfl,dxldcl,dxldkl,dxldalphal] = project_points2(Xckk,omckk,Tckk,fc_left(1),cc_left,kc_left,alpha_c_left);
                 dxldfl = repmat(dxldfl,[1 2]);
             else
                 [xl,dxldomckk,dxldTckk,dxldfl,dxldcl,dxldkl,dxldalphal] = project_points2(Xckk,omckk,Tckk,fc_left,cc_left,kc_left,alpha_c_left);
-            end;
+            end
         
             
             ekk(1:2*Nckk) = xlkk(:) - xl(:);
@@ -172,66 +151,50 @@ while (change > 5e-6)&(iter <= MaxIter),
             
             [omr,Tr,domrdomckk,domrdTckk,domrdom,domrdT,dTrdomckk,dTrdTckk,dTrdom,dTrdT] = compose_motion(omckk,Tckk,om,T);
             
-            if ~est_aspect_ratio_right,
+            if ~est_aspect_ratio_right
                 [xr,dxrdomr,dxrdTr,dxrdfr,dxrdcr,dxrdkr,dxrdalphar] = project_points2(Xckk,omr,Tr,fc_right(1),cc_right,kc_right,alpha_c_right);
                 dxrdfr = repmat(dxrdfr,[1 2]);
             else
                 [xr,dxrdomr,dxrdTr,dxrdfr,dxrdcr,dxrdkr,dxrdalphar] = project_points2(Xckk,omr,Tr,fc_right,cc_right,kc_right,alpha_c_right);
-            end;
-            
+            end
             
             ekk(2*Nckk+1:end) = xrkk(:) - xr(:);
             
-            
             dxrdom = dxrdomr * domrdom + dxrdTr * dTrdom;
             dxrdT = dxrdomr * domrdT + dxrdTr * dTrdT;
-            
             dxrdomckk = dxrdomr * domrdomckk + dxrdTr * dTrdomckk;
             dxrdTckk = dxrdomr * domrdTckk + dxrdTr * dTrdTckk;
             
             
             Jkk(2*Nckk+1:end,1+20:3+20) =  sparse(dxrdom);
             Jkk(2*Nckk+1:end,4+20:6+20) =  sparse(dxrdT);
-            
-            
             Jkk(2*Nckk+1:end,6*(kk-1)+7+20:6*(kk-1)+7+2+20) = sparse(dxrdomckk);
             Jkk(2*Nckk+1:end,6*(kk-1)+7+3+20:6*(kk-1)+7+5+20) = sparse(dxrdTckk);
-            
             Jkk(2*Nckk+1:end,11:12) = sparse(dxrdfr);
             Jkk(2*Nckk+1:end,13:14) = sparse(dxrdcr);
             Jkk(2*Nckk+1:end,15) = sparse(dxrdalphar);
             Jkk(2*Nckk+1:end,16:20) = sparse(dxrdkr);
             
-            
             emax = max(abs(ekk));
             
-            if iter == 1;
+            if iter == 1
                 e_ref = [e_ref;ekk];
-            end;
+            end
             
             
-            if emax < threshold,
-                
+            if emax < threshold
                 J = [J;Jkk];
-                e = [e;ekk];           
-                
+                e = [e;ekk];
             else
-                
                 fprintf(1,'Disabling view %d - Reason: the left and right images are found inconsistent (try help calib_stereo for more information)\n',kk);
-                
                 active_images(kk) = 0;
                 active_images_left(kk) = 0;
                 active_images_right(kk) = 0;
-                
-            end;
-            
+            end
         else
-            
             param = [param;NaN*ones(6,1)];
-            
-        end;
-        
-    end;
+        end
+    end
     
     history = [history param];
     

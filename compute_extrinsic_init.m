@@ -1,6 +1,5 @@
-function [omckk,Tckk,Rckk] = compute_extrinsic_init(x_kk,X_kk,fc,cc,kc,alpha_c),
-
-%compute_extrinsic
+function [ omckk, Tckk, Rckk] = compute_extrinsic_init(x_kk,X_kk,fc,cc,kc,alpha_c)
+%COMPUTE_EXTRINSIC_INIT
 %
 %[omckk,Tckk,Rckk] = compute_extrinsic_init(x_kk,X_kk,fc,cc,kc,alpha_c)
 %
@@ -31,40 +30,50 @@ function [omckk,Tckk,Rckk] = compute_extrinsic_init(x_kk,X_kk,fc,cc,kc,alpha_c),
 
 
 
-if nargin < 6,
-   alpha_c = 0;
-	if nargin < 5,
-   	kc = zeros(5,1);
-   	if nargin < 4,
-      	cc = zeros(2,1);
-      	if nargin < 3,
-         	fc = ones(2,1);
-         	if nargin < 2,
-            	error('Need 2D projections and 3D points (in compute_extrinsic.m)');
-            	return;
-         	end;
-      	end;
-   	end;
-	end;
-end;
+if nargin < 6
+    alpha_c = 0;
+    
+    if nargin < 5
+        kc = zeros(5,1);
+        
+        if nargin < 4
+            cc = zeros(2,1);
+            
+            if nargin < 3
+                fc = ones(2,1);
+                
+                if nargin < 2
+                    error('Need 2D projections and 3D points (in compute_extrinsic.m)');
+                    %             	return % 'error' already executes a 'return'
+                end
+            end
+        end
+    end
+end
 
 
 %keyboard;
 
 % Compute the normalized coordinates:
 
-xn = normalize_pixel(x_kk,fc,cc,kc,alpha_c);
+xn = normalize_pixel(x_kk,fc,cc,kc,alpha_c); % Output is same size as input.
 
 
 
 Np = size(xn,2);
 
-%% Check for planarity of the structure:
+% Check for planarity of the structure:
 %keyboard;
 
 X_mean = mean(X_kk')';
 
-Y = X_kk - (X_mean*ones(1,Np));
+% fprintf('Size of x_kk: %d by %d\n', size(x_kk))
+% fprintf('Size of xn: %d by %d\n', size(xn))
+% fprintf('Size of X_kk: %d by %d\n', size(X_kk))
+% fprintf('Size of X_mean: %d by %d\n', size(X_mean))
+% fprintf('Size of Np: %d\n', Np)
+% fprintf('Size of X_mean*ones(1,Np): %d by %d\n', size(X_mean*ones(1,Np)))
+Y = X_kk - (X_mean*ones(1, Np));
 
 YY = Y*Y';
 

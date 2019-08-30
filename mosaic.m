@@ -1,9 +1,9 @@
 
 if ~exist('I_1'),
    active_images_save = active_images;
-   ima_read_calib;
+   ima_read_calib_lab_data
    active_images = active_images_save;
-   check_active_images;
+   check_active_images
 end;
 
 check_active_images;

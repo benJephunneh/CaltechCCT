@@ -1,11 +1,10 @@
-function [xn] = normalize_pixel(x_kk,fc,cc,kc,alpha_c)
-
-%normalize
+function xn = normalize_pixel( x_kk, fc, cc, kc, alpha_c )
+%NORMALIZE
 %
-%[xn] = normalize_pixel(x_kk,fc,cc,kc,alpha_c)
+%xn = normalize_pixel(x_kk,fc,cc,kc,alpha_c)
 %
 %Computes the normalized coordinates xn given the pixel coordinates x_kk
-%and the intrinsic camera parameters fc, cc and kc.
+%and the intrinsic camera parameters fc, cc, kc, and alpha_c.
 %
 %INPUT: x_kk: Feature locations on the images
 %       fc: Camera focal length
@@ -19,18 +18,18 @@ function [xn] = normalize_pixel(x_kk,fc,cc,kc,alpha_c)
 %
 %comp_distortion_oulu: undistort pixel coordinates.
 
-if nargin < 5,
+if nargin < 5
    alpha_c = 0;
-   if nargin < 4;
+   if nargin < 4
       kc = [0;0;0;0;0];
-      if nargin < 3;
+      if nargin < 3
          cc = [0;0];
-         if nargin < 2,
+         if nargin < 2
             fc = [1;1];
-         end;
-      end;
-   end;
-end;
+         end
+      end
+   end
+end
 
 
 % First: Subtract principal point, and divide by the focal length:
@@ -39,9 +38,9 @@ x_distort = [(x_kk(1,:) - cc(1))/fc(1);(x_kk(2,:) - cc(2))/fc(2)];
 % Second: undo skew
 x_distort(1,:) = x_distort(1,:) - alpha_c * x_distort(2,:);
 
-if norm(kc) ~= 0,
+if norm(kc) % ~= 0
 	% Third: Compensate for lens distortion:
 	xn = comp_distortion_oulu(x_distort,kc);
 else
    xn = x_distort;
-end;
+end

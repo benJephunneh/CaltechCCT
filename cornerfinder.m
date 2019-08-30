@@ -1,8 +1,8 @@
-function [xc,good,bad,type] = cornerfinder(xt,I,wintx,winty,wx2,wy2);
+function [xc,good,bad,type] = cornerfinder(xt,I,wintx,winty,wx2,wy2)
 
 %[xc] = cornerfinder(xt,I);
 %
-%Finds the sub-pixel corners on the image I with initial guess xt
+%Finds the sub-pixel corners on the image I with initial guess, xt.
 %xt and xc are 2xN matrices. The first component is the x coordinate
 %(horizontal) and the second component is the y coordinate (vertical)
 % 

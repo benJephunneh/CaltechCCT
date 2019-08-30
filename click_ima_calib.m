@@ -21,10 +21,11 @@ fprintf(1,'Using (wintx,winty)=(%d,%d) - Window size = %dx%d      (Note: To rese
 %fprintf(1,'Note: To reset the window size, clear wintx and winty and run ''Extract grid corners'' again\n');
 
 
-ginputting = true; % Added by Caleb so he could re-do point selection on an image when he messes up:
+ginputting = true; % CPM: Added so I could re-do point selection on an image when I mess up:
 while ginputting
     figure(2);
     image(I);
+    axis image
     colormap(map);
     set(2,'color',[1 1 1]);
     
@@ -32,51 +33,41 @@ while ginputting
     disp('Click on the four extreme corners of the rectangular complete pattern (the first clicked corner is the origin)...');
     
     x= [];y = [];
-    figure(2); hold on;
+    figure(2);
     
     for count = 1:4
-        [xi,yi] = ginput4(1);
-        [xxi] = cornerfinder([xi yi],I,winty,wintx);
+        hold on
+        
+        [xi, yi] = ginput3(1); % ginput4(1);
+        xxi = cornerfinder([xi; yi],I,winty,wintx);
         xi = xxi(1);
         yi = xxi(2);
         figure(2);
         plot(xi,yi,'+','color',[ 1.000 0.314 0.510 ],'linewidth',2);
         plot(xi + [wintx+.5 -(wintx+.5) -(wintx+.5) wintx+.5 wintx+.5],yi + [winty+.5 winty+.5 -(winty+.5) -(winty+.5)  winty+.5],'-','color',[ 1.000 0.314 0.510 ],'linewidth',2);
-        x = [x;xi];
-        y = [y;yi];
-        plot(x,y,'-','color',[ 1.000 0.314 0.510 ],'linewidth',2);
+        x = [x; xi];
+        y = [y; yi];
+        plot(x, y, '-', 'color', [1.000 0.314 0.510], 'linewidth', 2);
         drawnow;
     end
     
-    % Added by Caleb:
-    inning = true;
-    while inning
-        corners = input('Are the four corners as desired ([y]/n)? ', 's');
-        if (isempty(corners) || strcmpi(corners,'y'))
-            inning = false;
-            ginputting = false;
-        elseif strcmpi(corners,'n')
-            inning = false;
-            xxi = [];
-            xi = [];
-            yi = [];
-            x = [];
-            y = [];
-            hold off
-        else
-            disp('Invalid selection')
-        end
+    % CPM:
+    query = input('Are the four corners selected as desired ([y]/n)? ', 's');
+    if isempty(query) || strcmpi(query(1), 'y')
+        ginputting = ~ginputting;
+    else
+        hold off
     end
 end
 
-plot([x;x(1)],[y;y(1)],'-','color',[ 1.000 0.314 0.510 ],'linewidth',2);
-drawnow;
-hold off;
+plot([x; x(1)], [y; y(1)], '-', 'color', [ 1.000 0.314 0.510 ], 'linewidth', 2)
+drawnow
+hold off
 
 
 %[x,y] = ginput4(4);
 
-[Xc,good,bad,type] = cornerfinder([x';y'],I,winty,wintx); % the four corners
+[Xc, good, bad, type] = cornerfinder([x'; y'], I, winty, wintx); % the four corners
 
 x = Xc(1,:)';
 y = Xc(2,:)';
@@ -89,9 +80,9 @@ x_v = x - x_mean;
 y_v = y - y_mean;
 
 theta = atan2(-y_v,x_v);
-[junk,ind] = sort(theta); % The returns seem to be unused -- changed in the next line without use.  If needed, change to [~, ~] = sort(theta);
+% [junk,ind] = sort(theta); % The returns seem to be unused -- changed in the next line without use.  If not needed, change to [~, ~] = sort(theta);
 
-[junk,ind] = sort(mod(theta-theta(1),2*pi)); % If 'junk' implies an unused return, change to [~, ind] = sort(mod(th...
+[~,ind] = sort(mod(theta-theta(1),2*pi)); % If 'junk' implies an unused return, change to [~, ind] = sort(mod(th...
 
 %ind = ind([2 3 4 1]);
 
@@ -131,21 +122,22 @@ vO = vO / norm(vO);
 delta = 30;
 
 
-figure(2); 
-image(I);
-colormap(map);
-hold on;
-plot([x;x(1)],[y;y(1)],'g-');
-plot(x,y,'og');
+figure(2);
+image(I)
+axis image
+colormap(map)
+hold on
+plot([x;x(1)],[y;y(1)],'g-')
+plot(x,y,'og')
 hx=text(x6 + delta * vX(1) ,y6 + delta*vX(2),'X');
-set(hx,'color','g','Fontsize',14);
+set(hx,'color','g','Fontsize',14)
 hy=text(x7 + delta*vY(1), y7 + delta*vY(2),'Y');
-set(hy,'color','g','Fontsize',14);
+set(hy,'color','g','Fontsize',14)
 hO=text(x4 + delta * vO(1) ,y4 + delta*vO(2),'O','color','g','Fontsize',14);
-hold off;
+hold off
 
 
-if manual_squares,
+if manual_squares
     
     n_sq_x = input(['Number of squares along the X direction ([]=' num2str(n_sq_x_default) ') = ']); %6
     if isempty(n_sq_x), n_sq_x = n_sq_x_default; end;
@@ -165,23 +157,23 @@ else
     
     % If could not count the number of squares, enter manually
     
-    if (n_sq_x1~=n_sq_x2)|(n_sq_y1~=n_sq_y2),
+    if (n_sq_x1~=n_sq_x2) | (n_sq_y1~=n_sq_y2)
         
         
         disp('Could not count the number of squares in the grid. Enter manually.');
         n_sq_x = input(['Number of squares along the X direction ([]=' num2str(n_sq_x_default) ') = ']); %6
-        if isempty(n_sq_x), n_sq_x = n_sq_x_default; end;
+        if isempty(n_sq_x), n_sq_x = n_sq_x_default; end
         n_sq_y = input(['Number of squares along the Y direction ([]=' num2str(n_sq_y_default) ') = ']); %6
-        if isempty(n_sq_y), n_sq_y = n_sq_y_default; end; 
+        if isempty(n_sq_y), n_sq_y = n_sq_y_default; end 
         
     else
         
         n_sq_x = n_sq_x1;
         n_sq_y = n_sq_y1;
         
-    end;
+    end
     
-end;
+end
 
 
 n_sq_x_default = n_sq_x;
@@ -195,8 +187,16 @@ if (~exist('dX', 'var') || ~exist('dY', 'var')) % This question is now asked onl
     
     dX = input(['Size dX of each square along the X direction ([]=' num2str(dX_default) 'mm) = ']);
     dY = input(['Size dY of each square along the Y direction ([]=' num2str(dY_default) 'mm) = ']);
-    if isempty(dX), dX = dX_default; else dX_default = dX; end
-    if isempty(dY), dY = dY_default; else dY_default = dY; end
+    if isempty(dX)
+        dX = dX_default;
+    else
+        dX_default = dX;
+    end
+    if isempty(dY)
+        dY = dY_default;
+    else
+        dY_default = dY;
+    end
     
 else
     
@@ -240,24 +240,24 @@ L = n_sq_y*dY;
 
 %%%%%%%%%%%%%%%%%%%%%%%% ADDITIONAL STUFF IN THE CASE OF HIGHLY DISTORTED IMAGES %%%%%%%%%%%%%
 figure(2);
-hold on;
+hold on
 plot(XX(1,:),XX(2,:),'r+');
 title('The red crosses should be close to the image corners');
-hold off;
+hold off
 
-disp('If the guessed grid corners (red crosses on the image) are not close to the actual corners,');
-disp('it is necessary to enter an initial guess for the radial distortion factor kc (useful for subpixel detection)');
+disp('If the guessed grid corners (red crosses on the image) are not close to the actual corners,')
+disp('it is necessary to enter an initial guess for the radial distortion factor kc (useful for subpixel detection)')
 quest_distort = input('Need of an initial guess for distortion? ([]=no, other=yes) ');
 
 quest_distort = ~isempty(quest_distort);
 
-if quest_distort,
+if quest_distort
     % Estimation of focal length:
     c_g = [size(I,2);size(I,1)]/2 + .5;
     f_g = Distor2Calib(0,[[x(1) x(2) x(4) x(3)] - c_g(1);[y(1) y(2) y(4) y(3)] - c_g(2)],1,1,4,W,L,[-W/2 W/2 W/2 -W/2;L/2 L/2 -L/2 -L/2; 0 0 0 0],100,1,1);
     f_g = mean(f_g);
     script_fit_distortion;
-end;
+end
 %%%%%%%%%%%%%%%%%%%%% END ADDITIONAL STUFF IN THE CASE OF HIGHLY DISTORTED IMAGES %%%%%%%%%%%%%
 
 
@@ -266,7 +266,7 @@ end;
 
 Np = (n_sq_x+1)*(n_sq_y+1);
 
-disp('Corner extraction...');
+disp('Corner extraction...')
 
 grid_pts = cornerfinder(XX,I,winty,wintx); %%% Finds the exact corners at every points!
 
@@ -305,9 +305,9 @@ set(h3,'Color','g','FontSize',14);
 xlabel('Xc (in camera frame)');
 ylabel('Yc (in camera frame)');
 title('Extracted corners');
-zoom on;
-drawnow;
-hold off;
+zoom on
+drawnow
+hold off
 
 
 Xi = reshape(([0:n_sq_x]*dX)'*ones(1,n_sq_y+1),Np,1)';

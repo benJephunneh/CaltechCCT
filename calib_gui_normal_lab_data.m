@@ -19,7 +19,7 @@ kc = zeros(5,1);
 clearwin;
 
 cell_list{1,1} = {'Image names','data_calib_lab_data;'};
-cell_list{1,2} = {'Read images','ima_read_calib;'};
+cell_list{1,2} = {'Read images','ima_read_calib_lab_data;'};
 cell_list{1,3} = {'Extract grid corners','click_calib;'};
 cell_list{1,4} = {'Calibration','go_calib_optim;'};
 cell_list{2,1} = {'Show Extrinsic','ext_calib;'};

@@ -1,25 +1,26 @@
 
-if ~exist('n_ima'),
+if ~exist('n_ima', 'var')
    fprintf(1,'No data to process.\n');
-   return;
-end;
+   return
+end
 
-if n_ima == 0,
+if ~n_ima
     fprintf(1,'No image data available\n');
-    return;
-end;
+    return
+end
 
-if ~exist('active_images'),
+if ~exist('active_images', 'var')
 	active_images = ones(1,n_ima);
-end;
+end
+
 n_act = length(active_images);
-if n_act < n_ima,
+if n_act < n_ima
    active_images = [active_images ones(1,n_ima-n_act)];
 else
-   if n_act > n_ima,
+   if n_act > n_ima
       active_images = active_images(1:n_ima);
-   end;
-end;
+   end
+end
 
 ind_active = find(active_images);
 
@@ -28,52 +29,34 @@ ind_active = find(active_images);
 
 
 fprintf(1,'\nThis function is useful to select a subset of images to calibrate\n');
-
-   fprintf(1,'\nThere are currently %d active images selected for calibration (out of %d):\n',length(ind_active),n_ima);
+fprintf(1,'\nThere are currently %d active images selected for calibration (out of %d):\n',length(ind_active),n_ima);
    
-   if ~isempty(ind_active),
+if ~isempty(ind_active)
+    if length(ind_active) > 2
+        for ii = 1:length(ind_active)-2
+            fprintf(1,'%d, ',ind_active(ii));
+        end
+        fprintf(1,'%d and %d.',ind_active(end-1),ind_active(end));
+    elseif length(ind_active) == 2
+        fprintf(1,'%d and %d.',ind_active(end-1),ind_active(end));
+    else
+        fprintf(1,'%d.',ind_active(end));
+    end
+end
       
-      if length(ind_active) > 2,
-      
-   		for ii = 1:length(ind_active)-2,
-      		
-         	fprintf(1,'%d, ',ind_active(ii));
-         	
-      	end;
-      	
-      	fprintf(1,'%d and %d.',ind_active(end-1),ind_active(end));
-         
-      else
-         
-         if length(ind_active) == 2,
-            
-            fprintf(1,'%d and %d.',ind_active(end-1),ind_active(end));
-            
-         else
-            
-            fprintf(1,'%d.',ind_active(end));
-            
-         end;
-         
-         
-      end;
-      
-   end;
-      
-      
-   fprintf(1,'\n');
+fprintf(1,'\n');
    
-   if length(ind_active)==0,
-      fprintf(1,'\nYou probably want to add images\n');
-      choice = 1;
-   else
-      if length(ind_active)==n_ima,
-         fprintf(1,'\nYou probably want to suppress images\n');
-         choice = 0;
-      else
-         choice = 2;
-      end;
-   end;
+if isempty(ind_active) % length(ind_active) == 0
+    fprintf(1,'\nYou probably want to add images\n');
+    choice = 1;
+else
+    if length(ind_active)==n_ima
+        fprintf(1,'\nYou probably want to suppress images\n');
+        choice = 0;
+    else
+        choice = 2;
+    end
+end
    
    if (choice~=0) & (choice ~=1),
    	fprintf(1,'\nDo you want to suppress or add images from that list?\n');

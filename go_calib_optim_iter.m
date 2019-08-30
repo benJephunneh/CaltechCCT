@@ -29,50 +29,39 @@
 %In the future, a more general function will be there.
 %For now, if using a 3D calibration rig, quick_init is set to 1 for an easy initialization of the focal length
 
-if ~exist('desactivated_images'),
+if ~exist('desactivated_images', 'var')
     desactivated_images = [];
-end;
-
-
-
-if ~exist('est_aspect_ratio'),
+end
+if ~exist('est_aspect_ratio', 'var')
     est_aspect_ratio = 1;
-end;
-
-if ~exist('est_fc');
+end
+if ~exist('est_fc', 'var')
     est_fc = [1;1]; % Set to zero if you do not want to estimate the focal length (it may be useful! believe it or not!)
-end;
-
-if ~exist('recompute_extrinsic'),
+end
+if ~exist('recompute_extrinsic', 'var')
     recompute_extrinsic = 1; % Set this variable to 0 in case you do not want to recompute the extrinsic parameters
     % at each iterstion.
-end;
-
-if ~exist('MaxIter'),
+end
+if ~exist('MaxIter', 'var')
     MaxIter = 30; % Maximum number of iterations in the gradient descent
-end;
-
-if ~exist('check_cond'),
+end
+if ~exist('check_cond', 'var')
     check_cond = 1; % Set this variable to 0 in case you don't want to extract view dynamically
-end;
-
-if ~exist('center_optim'),
+end
+if ~exist('center_optim', 'var')
     center_optim = 1; %%% Set this variable to 0 if your do not want to estimate the principal point
-end;
-
-if exist('est_dist'),
-    if length(est_dist) == 4,
-        est_dist = [est_dist ; 0];
-    end;
-end;
-
-if ~exist('est_dist'),
-    est_dist = [1;1;1;1;0];
-end;
-
-if ~exist('est_alpha'),
+end
+if exist('est_dist', 'var')
+    if length(est_dist) == 4
+        est_dist = [est_dist ; 1]; % 0];
+    end
+end
+if ~exist('est_dist', 'var')
+    est_dist = [1;1;1;1;1]; % 0];
+end
+if ~exist('est_alpha', 'var')
     est_alpha = 0; % by default, do not estimate skew
-end;
+end
 
 
 % Little fix in case of stupid values in the binary variables:
@@ -86,11 +75,11 @@ est_aspect_ratio = double(~~est_aspect_ratio);
 
 fprintf(1,'\n');
 
-if ~exist('nx')&~exist('ny'),
-    fprintf(1,'WARNING: No image size (nx,ny) available. Setting nx=640 and ny=480. If these are not the right values, change values manually.\n');
-    nx = 640;
-    ny = 480;
-end;
+if ~exist('nx', 'var') && ~exist('ny', 'var')
+    fprintf(1,'WARNING: No image size (nx,ny) available. Setting nx=1280 and ny=720. If these are not the right values, change values manually.\n');
+    nx = 1280;
+    ny = 720;
+end
 
 
 check_active_images;
@@ -101,61 +90,61 @@ quick_init = 0; % Set to 1 for using a quick init (necessary when using 3D rigs)
 
 % Check 3D-ness of the calibration rig:
 rig3D = 0;
-for kk = ind_active,
+for kk = ind_active
     eval(['X_kk = X_' num2str(kk) ';']);
-    if is3D(X_kk),
+    if is3D(X_kk)
         rig3D = 1;
-    end;
-end;
+    end
+end
 
 
-if center_optim & (length(ind_active) < 2) & ~rig3D,
+if center_optim && (length(ind_active) < 2) & ~rig3D
     fprintf(1,'WARNING: Principal point rejected from the optimization when using one image and planar rig (center_optim = 1).\n');
     center_optim = 0; %%% when using a single image, please, no principal point estimation!!!
     est_alpha = 0;
-end;
+end
 
-if ~exist('dont_ask'),
+if ~exist('dont_ask', 'var')
     dont_ask = 0;
-end;
+end
 
-if center_optim & (length(ind_active) < 5) & ~rig3D,
+if center_optim && (length(ind_active) < 5) & ~rig3D
     fprintf(1,'WARNING: The principal point estimation may be unreliable (using less than 5 images for calibration).\n');
     %if ~dont_ask,
     %   quest = input('Are you sure you want to keep the principal point in the optimization process? ([]=yes, other=no) ');
     %   center_optim = isempty(quest);
     %end;
-end;
+end
 
 
 % A quick fix for solving conflict
-if ~isequal(est_fc,[1;1]),
+if ~isequal(est_fc,[1;1])
     est_aspect_ratio=1;
-end;
-if ~est_aspect_ratio,
+end
+if ~est_aspect_ratio
     est_fc=[1;1];
-end;
+end
 
 
-if ~est_aspect_ratio,
+if ~est_aspect_ratio
     fprintf(1,'Aspect ratio not optimized (est_aspect_ratio = 0) -> fc(1)=fc(2). Set est_aspect_ratio to 1 for estimating aspect ratio.\n');
 else
-    if isequal(est_fc,[1;1]),
+    if isequal(est_fc,[1;1])
         fprintf(1,'Aspect ratio optimized (est_aspect_ratio = 1) -> both components of fc are estimated (DEFAULT).\n');
-    end;
-end;
+    end
+end
 
-if ~isequal(est_fc,[1;1]),
-    if isequal(est_fc,[1;0]),
+if ~isequal(est_fc,[1;1])
+    if isequal(est_fc,[1;0])
         fprintf(1,'The first component of focal (fc(1)) is estimated, but not the second one (est_fc=[1;0])\n');
     else
-        if isequal(est_fc,[0;1]),
+        if isequal(est_fc,[0;1])
             fprintf(1,'The second component of focal (fc(1)) is estimated, but not the first one (est_fc=[0;1])\n');
         else
             fprintf(1,'The focal vector fc is not optimized (est_fc=[0;0])\n');
-        end;
-    end;
-end;
+        end
+    end
+end
 
 
 if ~center_optim, % In the case where the principal point is not estimated, keep it at the center of the image
@@ -288,7 +277,7 @@ end;
 
 
 %%% Initialization of the extrinsic parameters for global minimization:
-comp_ext_calib;
+comp_ext_calib
 
 
 

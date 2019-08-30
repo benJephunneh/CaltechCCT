@@ -54,7 +54,7 @@ end;
 
 check_active_images;
 
-if ~exist('solution_init'), solution_init = []; end;
+if ~exist('solution_init'), solution_init = []; end
 
 for kk = 1:n_ima,
    if ~exist(['dX_' num2str(kk)]), eval(['dX_' num2str(kk) '= dX;']); end;
@@ -153,23 +153,23 @@ end;
 
 save_name = 'Calibration_Results';
 
-if exist([ save_name '.mat'])==2,
+if exist([save_name '.mat'], 'file') % ==2,
     disp('WARNING: File Calib_Results.mat already exists');
     if exist('copyfile'),
         pfn = -1;
         cont = 1;
-        while cont,
+        while cont
             pfn = pfn + 1;
             postfix = ['_old' num2str(pfn)];
-            save_name = [ 'Calib_Results' postfix];
-            cont = (exist([ save_name '.mat'])==2);
-        end;
+            save_name = ['Calib_Results' postfix];
+            cont = exist([save_name '.mat'], 'file'); % ==2);
+        end
         copyfile('Calib_Results.mat',[save_name '.mat']);
         disp(['Copying the current Calib_Results.mat file to ' save_name '.mat']);
-        if exist('Calib_Results.m')==2,
-            copyfile('Calib_Results.m',[save_name '.m']);
+        if exist('Calib_Results.m', 'file') % ==2,
+            copyfile('Calib_Results.m', [save_name '.m']);
             disp(['Copying the current Calib_Results.m file to ' save_name '.m']);
-        end;
+        end
         cont_save = 1;
     else
         disp('The file Calib_Results.mat is about to be changed.');
