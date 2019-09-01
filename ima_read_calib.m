@@ -1,44 +1,36 @@
-% 
-% if ~exist('calib_name', 'var') || ~exist('format_image', 'var')
-%    data_calib
-%    return
-% end
+%%%----- Read selected images -----%%%
 
-check_directory;
-
-if ~exist('n_ima')
+if ~exist('calib_name', 'var') || ~exist('format_image', 'var')
    data_calib
-   return
+%    return
 end
 
-check_active_images;
+check_directory
 
+if ~exist('n_ima', 'var')
+   data_calib
+%    return
+end
 
+check_active_images
 images_read = active_images;
 
-
-if exist('image_numbers')
+if exist('image_numbers', 'var')
    first_num = image_numbers(1);
 end
-
 
 % Just to fix a minor bug:
-if ~exist('first_num')
+if ~exist('first_num', 'var')
    first_num = image_numbers(1);
 end
 
-
 image_numbers = first_num:n_ima-1+first_num;
-
 no_image_file = 0;
 
 i = 1;
-
-while (i <= n_ima), % & (~no_image_file),
-   
-   if active_images(i),
-   
-   	%fprintf(1,'Loading image %d...\n',i);
+while i <= n_ima % & (~no_image_file),
+    if active_images(i)
+%         fprintf(1,'Loading image %d...\n',i);
    
    	if ~type_numbering,   
       	number_ext =  num2str(image_numbers(i));

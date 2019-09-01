@@ -20,7 +20,7 @@ end
     
 % Number of images...
 first_num = min(indices);
-n_ima = max(indices) - first_num + 1; % % CPM: What a strange number this could be.
+n_ima = max(indices) - first_num + 1; % % CPM: What a strange and seemingly irrelevant number this could be.
 
 if min(string_length) == max(string_length)
     N_slots = min(string_length);
