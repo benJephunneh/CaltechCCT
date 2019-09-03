@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 if n_ima
+=======
+if n_ima % ~= 0
+>>>>>>> bcabd4dfe6ae46ccc99a7c5868c032dcce1972b6
     
     if ~exist('active_images', 'var')
         active_images = ones(1,n_ima);
@@ -14,10 +18,16 @@ if n_ima
     
     ind_active = find(active_images);
     
+<<<<<<< HEAD
 %     if prod(double(active_images == 0)),
     if ~any(active_images)
         disp('Error: There is no active image. Run Add/Suppress images to add images');
         return;
+=======
+    if ~any(active_images) % prod(double(active_images ==0))
+        disp('Error: There is no active image. Run Add/Suppress images to add images');
+        return
+>>>>>>> bcabd4dfe6ae46ccc99a7c5868c032dcce1972b6
     end
     
     if exist('center_optim', 'var')

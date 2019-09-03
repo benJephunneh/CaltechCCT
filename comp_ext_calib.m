@@ -8,10 +8,14 @@ for kk = 1:n_ima
     
     if exist(['x_' num2str(kk)], 'var') % E.g. x_1 exists...
         
-        eval(['x_kk = x_' num2str(kk) ';']);
-        eval(['X_kk = X_' num2str(kk) ';']);
+        eval(['x_kk = x_' num2str(kk) ';'])
+        eval(['X_kk = X_' num2str(kk) ';'])
         
+<<<<<<< HEAD
         if isnan(x_kk(1,1))
+=======
+        if isnan(x_kk(1))
+>>>>>>> bcabd4dfe6ae46ccc99a7c5868c032dcce1972b6
             if active_images(kk)
                 fprintf(1,'Warning: Cannot calibrate with image %d. Need to extract grid corners first.\n',kk)
                 fprintf(1,'         Set active_images(%d)=1; and run Extract grid corners.\n',kk)
@@ -40,7 +44,6 @@ for kk = 1:n_ima
         end
         
     else
-        
         omckk = NaN*ones(3,1);
         Tckk = NaN*ones(3,1);
         

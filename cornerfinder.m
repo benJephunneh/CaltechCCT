@@ -70,9 +70,9 @@ resolution = 0.005;
 MaxIter = 10;
 
 [nx,ny] = size(I);
-N = size(xt,1);
+N = size(xt,2);% 1);
 
-xc = xt; % first guess... they don't move !!!
+xc = xt % first guess... they don't move !!!
 
 type = zeros(1,N);
 

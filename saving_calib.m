@@ -1,8 +1,8 @@
 
-if ~exist('n_ima')|~exist('fc'),
+if ~exist('n_ima', 'var') || ~exist('fc', 'var')
    fprintf(1,'No calibration data available.\n');
-   return;
-end;
+   return
+end
 
 if ~exist('no_image'),
     no_image = 0;
@@ -153,7 +153,11 @@ end;
 
 save_name = 'Calibration_Results';
 
+<<<<<<< HEAD
 if exist([save_name '.mat'], 'file') % ==2,
+=======
+if exist([ save_name '.mat'], 'file') % ==2
+>>>>>>> bcabd4dfe6ae46ccc99a7c5868c032dcce1972b6
     disp('WARNING: File Calib_Results.mat already exists');
     if exist('copyfile'),
         pfn = -1;

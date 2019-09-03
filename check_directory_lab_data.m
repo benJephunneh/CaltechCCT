@@ -39,6 +39,7 @@ for ii = 1:length(l)
 %         l{ii} = {};
 %         continue
     else
+<<<<<<< HEAD
         Nima_valid = Nima_valid + 1
         indices = [indices ii]
         string_length = [string_length length(tokens.numb)];
@@ -243,6 +244,53 @@ end
 %     
 % end
 % 
+=======
+        
+        % Get all the string numbers:
+        
+        string_length = zeros(1,Nima_valid);
+        indices =  zeros(1,Nima_valid);
+        
+        
+        for ppp = 1:Nima_valid
+            
+            name = l(ind_valid(ppp)).name;
+            string_num = name(length_name+1:loc_extension(ppp) - 2);
+            string_length(ppp) = size(string_num,2);
+            indices(ppp) = str2num(string_num);
+            
+        end
+        
+        % Number of images...
+        first_num = min(indices);
+        n_ima = max(indices) - first_num + 1;
+        
+        if min(string_length) == max(string_length)
+            
+            N_slots = min(string_length);
+            type_numbering = 1;
+            
+        else
+            
+            N_slots = 1;
+            type_numbering = 0;
+            
+        end
+        
+        image_numbers = first_num:n_ima-1+first_num;
+        
+        %%% By default, all the images are active for calibration:
+        
+        active_images = ones(1,n_ima);
+        
+    end
+    
+else
+    
+    fprintf(1,'No image found. Basename may be wrong.\n');
+    
+end
+>>>>>>> bcabd4dfe6ae46ccc99a7c5868c032dcce1972b6
 
 clear string_length string_num loc_extension expr tokens
 % cd(owd)

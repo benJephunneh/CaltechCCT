@@ -1,8 +1,8 @@
 check_active_images;
 
-for kk =  ind_active,
+for kk =  ind_active
    
-   if ~exist(['x_' num2str(kk)]),
+   if ~exist(['x_' num2str(kk)], 'var')
       
       fprintf(1,'WARNING: Need to extract grid corners on image %d\n',kk);
       

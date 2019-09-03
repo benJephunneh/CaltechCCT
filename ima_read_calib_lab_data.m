@@ -1,5 +1,9 @@
 % Modified to open lab data format. - 04/10/19 (DY)
+<<<<<<< HEAD
 % Modified for code improvements. - 16 Aug 19 (CPM)
+=======
+% Modified: 15 Aug 19 (CPM)
+>>>>>>> bcabd4dfe6ae46ccc99a7c5868c032dcce1972b6
 
 if ~exist('calib_name', 'var') || ...
    ~exist('format_image', 'var') || ...

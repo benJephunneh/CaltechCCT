@@ -30,28 +30,27 @@
 %For now, if using a 3D calibration rig, set quick_init to 1 for an easy initialization of the focal length
 
 
-if ~exist('n_ima', 'var')
-   data_calib; % Load the images
-   click_calib; % Extract the corners
+while ~exist('n_ima', 'var')
+       data_calib_lab_data; % Load the images, whence 'n_ima' indirectly comes.
+%        check_active_images; This is run in the first line of 'check_extracted_images'.
+       check_extracted_images;
+       check_active_images;
 end
+click_calib; % Extract the corners
 
-
-check_active_images
-check_extracted_images
-check_active_images
 desactivated_images = [];
 
 recompute_extrinsic = (length(ind_active) < 100); % if there are too many images, do not spend time recomputing the extrinsic parameters twice..
 
 %%% MAIN OPTIMIZATION CALL!!!!! (look into this function for the details of implementation)
-go_calib_optim_iter
+go_calib_optim_iter;
 
 if ~isempty(desactivated_images)
    param_list_save = param_list;
    fprintf(1,'\nNew optimization including the images that have been deactivated during the previous optimization.\n');
    active_images(desactivated_images) = ones(1,length(desactivated_images));
    desactivated_images = [];
-   go_calib_optim_iter
+   go_calib_optim_iter;
    if ~isempty(desactivated_images)
       fprintf(1,['List of images left desactivated: ' num2str(desactivated_images) '\n' ] );
    end

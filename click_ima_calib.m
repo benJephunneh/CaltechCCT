@@ -36,10 +36,15 @@ while ginputting
     figure(2);
     
     for count = 1:4
+<<<<<<< HEAD
         hold on
         
         [xi, yi] = ginput3(1); % ginput4(1);
         xxi = cornerfinder([xi; yi],I,winty,wintx);
+=======
+        [xi,yi] = ginput4(1);
+        [xxi] = cornerfinder([xi; yi],I,winty,wintx);
+>>>>>>> bcabd4dfe6ae46ccc99a7c5868c032dcce1972b6
         xi = xxi(1);
         yi = xxi(2);
         figure(2);
